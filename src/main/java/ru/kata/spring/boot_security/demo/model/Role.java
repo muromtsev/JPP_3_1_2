@@ -3,36 +3,42 @@ package ru.kata.spring.boot_security.demo.model;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name="role")
+@Table(name = "roles")
 public class Role implements GrantedAuthority {
 
     @Id
-    private int id;
+    @Column(name = "role_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int roleId;
+
+    @Column(name = "name")
     private String name;
-    @Transient
-    @ManyToMany(mappedBy = "roles")
+
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     private Set<User> users;
 
-    public Role() {}
-
-    public Role(int id) {
-        this.id = id;
+    @Override
+    public String getAuthority() {
+        return getName();
     }
 
-    public Role(int id, String name) {
-        this.id = id;
-        this.name = name;
+    public Role(String role) {
+        this.name = role;
     }
 
-    public int getId() {
-        return id;
+    public Role() {
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public int getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(int roleId) {
+        this.roleId = roleId;
     }
 
     public String getName() {
@@ -43,16 +49,37 @@ public class Role implements GrantedAuthority {
         this.name = name;
     }
 
-    public Set<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(Set<User> users) {
-        this.users = users;
+    @Override
+    public String toString() {
+        return this.name;
     }
 
     @Override
-    public String getAuthority() {
-        return getName();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Role role = (Role) o;
+        return roleId == role.roleId && Objects.equals(name, role.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(roleId, name);
+    }
+
+    public String getRole() {
+        return name;
+    }
+
+    public void setRole(String role) {
+        this.name = role;
+    }
+
+    public void setId(int id) {
+        this.roleId = id;
+    }
+
+    public int getId() {
+        return roleId;
     }
 }
